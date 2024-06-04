@@ -1,21 +1,29 @@
 import React, { useEffect, useState } from "react";
-import { Button, Container, Form, Nav, Navbar } from "react-bootstrap";
+import { Button, Container, Form, Image} from "react-bootstrap";
 import { addDoc, collection } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useNavigate } from "react-router-dom";
-import { auth, db } from "../firebase";
+import { auth, db, storage } from "../firebase";
 import { signOut } from "firebase/auth";
 import Navigation from "../components/Navigation"
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage"
 
 
 export default function PostPageAdd() {
   const  [caption, setCaption] = useState("");
   const [ image, setImage] = useState("");
   const [ user, loading ] = useAuthState(auth);
+  const [imageName,setImageName] =useState("");
   const navigate = useNavigate();
+  const [previewImage, setPreviewImage] = useState(
+    "https://zca.sg/img/placeholder"
+  );
 
   async function addPost() {
-    await addDoc(collection (db, "posts"),{caption,image});
+    const imageReference = ref(storage, `images/${image.name}`);
+    const response = await uploadBytes(imageReference,image);
+    const imageUrl = await getDownloadURL(response.ref)
+    await addDoc(collection (db, "posts"),{caption,image:imageUrl,imageName:imageName});
     navigate("/");
   }
 
@@ -50,13 +58,29 @@ export default function PostPageAdd() {
             />
           </Form.Group>
 
+          <Image 
+          src = {previewImage} 
+          style={{
+            objectFit:"cover",
+            width: "10rem",
+            height: "10rem"
+          }}
+          />
           <Form.Group className="mb-3" controlId="image">
             <Form.Label>Image URL</Form.Label>
             <Form.Control
-              type="text"
-              placeholder="https://zca.sg/img/1"
-              value={image}
-              onChange={(text) => setImage(text.target.value)}
+              type="file"
+              // placeholder="https://zca.sg/img/1"
+              // value={image}
+              onChange={(e) => {
+                // console.log(e.target.files[0]);
+                const imageFile=e.target.files[0];
+                setImage(e.target.files[0]);
+                const previewImage = URL.createObjectURL(imageFile);
+                setPreviewImage(previewImage);
+                setImageName(imageFile.name);
+              }
+              }
             />
             <Form.Text className="text-muted">
               Make sure the url has a image type at the end: jpg, jpeg, png.

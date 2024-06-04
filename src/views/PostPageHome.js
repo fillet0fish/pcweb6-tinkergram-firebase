@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Container, Image, Nav, Navbar, Row } from "react-bootstrap";
+import { Container, Image, Row } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
@@ -11,7 +11,10 @@ export default function PostPageHome() {
    async function getAllPosts() {
     const query = await getDocs(collection(db, "posts"));
     const posts = query.docs.map (doc => {
-      return { id: doc.id, ...doc.data()};
+      return { 
+        id: doc.id, 
+        ...doc.data(), 
+        };
     });
     setPosts(posts);
   }
@@ -21,7 +24,11 @@ export default function PostPageHome() {
   }, []);
 
   const ImagesRow = () => {
-    return posts.map((post, index) => <ImageSquare key={index} post={post} />);
+    return posts.map((post, index) => 
+    <ImageSquare 
+    key={index} 
+    post={post}
+    />);
   };
 
   return (
@@ -63,6 +70,9 @@ function ImageSquare({ post }) {
           height: "18rem",
         }}
       />
+      {/* <figcaption style={{ fontSize: "0.8rem", textAlign: "center" }}>
+        {caption}
+      </figcaption> */}
     </Link>
   );
 }

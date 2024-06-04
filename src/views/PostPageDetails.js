@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Card, Col, Container, Image, Nav, Navbar, Row } from "react-bootstrap";
+import { Card, Col, Container, Image, Row } from "react-bootstrap";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, db } from "../firebase";
+import { auth, db, storage } from "../firebase";
 import { signOut } from "firebase/auth";
 import { deleteDoc, doc, getDoc } from "firebase/firestore";
 import Navigation from "../components/Navigation"
+import { getStorage, ref, deleteObject } from "firebase/storage";
+
 
 export default function PostPageDetails() {
   const [caption, setCaption] = useState("");
@@ -17,7 +19,15 @@ export default function PostPageDetails() {
 
 
   async function deletePost(id) {
-    await deleteDoc(doc(db,"posts",id));
+    const postDocument = await getDoc(doc(db, "posts", id));
+    const post = postDocument.data();
+    const desertRef = ref(storage, `images/${post.imageName}`);
+    deleteObject (desertRef).then(()=>{
+      console.log("Deleted from firebase storage")
+    }).catch((error) => {
+      console.log(error.message)
+    });
+    await deleteDoc(doc(db, "posts", id));
     navigate("/");
   }
 
