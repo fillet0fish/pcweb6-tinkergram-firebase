@@ -1,23 +1,34 @@
 import React, { useEffect, useState } from "react";
 import { Card, Col, Container, Image, Nav, Navbar, Row } from "react-bootstrap";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth, db } from "../firebase";
+import { signOut } from "firebase/auth";
+import { deleteDoc, doc, getDoc } from "firebase/firestore";
 
 export default function PostPageDetails() {
   const [caption, setCaption] = useState("");
   const [image, setImage] = useState("");
   const params = useParams();
   const id = params.id;
+  const [ user, loading ] = useAuthState(auth);
+  const navigate = useNavigate();
+
 
   async function deletePost(id) {}
 
   async function getPost(id) {
-    setCaption("");
-    setImage("");
+    const postDocument = await getDoc(doc(db, "posts", id));
+    const post = postDocument.data();
+    setCaption(post.caption);
+    setImage(post.image);
   }
 
   useEffect(() => {
+    if(loading) return;
+    if (!user) navigate ("/login");
     getPost(id);
-  }, [id]);
+  }, [id, navigate, user, loading]);
 
   return (
     <>
@@ -26,7 +37,7 @@ export default function PostPageDetails() {
           <Navbar.Brand href="/">Tinkergram</Navbar.Brand>
           <Nav>
             <Nav.Link href="/add">New Post</Nav.Link>
-            <Nav.Link href="/add">🚪</Nav.Link>
+            <Nav.Link onClick = {(e)=> signOut(auth)}> Sign Out </Nav.Link>
           </Nav>
         </Container>
       </Navbar>
