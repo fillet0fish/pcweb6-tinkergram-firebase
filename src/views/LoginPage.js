@@ -1,10 +1,20 @@
 import React, { useState } from "react";
 import { Button, Container, Form } from "react-bootstrap";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import { auth } from "../firebase";
+import Navigation from "../components/Navigation"
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+ 
+
   return (
+    <>
+    <Navigation/>
     <Container>
       <h1 className="my-3">Login to your account</h1>
       <Form>
@@ -31,11 +41,25 @@ export default function LoginPage() {
           />
           <a href="/signup">Sign up for an account</a>
         </Form.Group>
-        <Button variant="primary" onClick={async (e) => {}}>
+        <Button 
+        variant="primary" 
+        onClick={async (e) => {
+          setError("");
+          const canLogin = username && password;
+          if (canLogin){
+            try {
+              await signInWithEmailAndPassword(auth, username,password);
+              navigate("/");
+            } catch (error){
+              setError(error.message)
+            }
+          }
+        }}>
           Login
         </Button>
       </Form>
       <p></p>
     </Container>
+    </>
   );
 }
