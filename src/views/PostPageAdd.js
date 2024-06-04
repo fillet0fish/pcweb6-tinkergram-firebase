@@ -5,6 +5,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase";
 import { signOut } from "firebase/auth";
+import Navigation from "../components/Navigation"
 
 
 export default function PostPageAdd() {
@@ -26,7 +27,8 @@ export default function PostPageAdd() {
 
   return (
     <>
-      <Navbar variant="light" bg="light">
+    <Navigation />
+      {/* <Navbar variant="light" bg="light">
         <Container>
           <Navbar.Brand href="/">Tinkergram</Navbar.Brand>
           <Nav>
@@ -34,7 +36,7 @@ export default function PostPageAdd() {
             <Nav.Link onClick = {(e) => signOut(auth)}>🚪</Nav.Link>
           </Nav>
         </Container>
-      </Navbar>
+      </Navbar> */}
       <Container>
         <h1 style={{ marginBlock: "1rem" }}>Add Post</h1>
         <Form>

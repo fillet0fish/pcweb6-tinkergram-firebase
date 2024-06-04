@@ -5,6 +5,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../firebase";
 import { signOut } from "firebase/auth";
 import { deleteDoc, doc, getDoc } from "firebase/firestore";
+import Navigation from "../components/Navigation"
 
 export default function PostPageDetails() {
   const [caption, setCaption] = useState("");
@@ -15,7 +16,10 @@ export default function PostPageDetails() {
   const navigate = useNavigate();
 
 
-  async function deletePost(id) {}
+  async function deletePost(id) {
+    await deleteDoc(doc(db,"posts",id));
+    navigate("/");
+  }
 
   async function getPost(id) {
     const postDocument = await getDoc(doc(db, "posts", id));
@@ -32,7 +36,8 @@ export default function PostPageDetails() {
 
   return (
     <>
-      <Navbar variant="light" bg="light">
+    <Navigation />
+      {/* <Navbar variant="light" bg="light">
         <Container>
           <Navbar.Brand href="/">Tinkergram</Navbar.Brand>
           <Nav>
@@ -40,7 +45,7 @@ export default function PostPageDetails() {
             <Nav.Link onClick = {(e)=> signOut(auth)}> Sign Out </Nav.Link>
           </Nav>
         </Container>
-      </Navbar>
+      </Navbar> */}
       <Container>
         <Row style={{ marginTop: "2rem" }}>
           <Col md="6">
